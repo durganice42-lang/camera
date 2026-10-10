@@ -1,0 +1,256 @@
+/* ============================================================
+   CAMERA ZOOM EXPERIENCE — RESPONSIVE
+   responsive.css
+   ============================================================ */
+
+/* ── 1440px+ (baseline — already designed for this) ─────────── */
+
+/* ── 1200px ─────────────────────────────────────────────────── */
+@media (max-width:1200px) {
+  #site-header { padding:1.4rem 2.5rem; }
+  #site-header.scrolled { padding:1rem 2.5rem; }
+
+  .intro-inner { gap:4rem; }
+  .footer-grid { grid-template-columns:1.5fr 1fr 1fr; gap:2.5rem; }
+  .footer-grid .footer-newsletter { grid-column:1/-1; }
+
+  .container { padding:0 2.5rem; }
+  .tech-inner,
+  .gallery-inner,
+  .features-inner,
+  .components-inner { padding:0 2.5rem; }
+
+  .hero-text-left,
+  .hero-text-right { display:none; }
+
+  .lens-info--left { right:calc(100% + 2rem); max-width:200px; }
+  .lens-info--right { left:calc(100% + 2rem); max-width:200px; }
+
+  .contact-grid { padding:0 2.5rem; gap:3rem; }
+}
+
+/* ── 992px (tablet landscape) ──────────────────────────────── */
+@media (max-width:992px) {
+  /* header */
+  .header-nav { display:none; }
+  .hamburger  { display:flex; }
+
+  /* hero */
+  #camera-3d { width:min(380px,72vw); height:min(380px,72vw); }
+  .hud-ring--3,
+  .hud-ring--4 { display:none; }
+  .hud-brackets { width:420px; height:420px; }
+
+  .hero-h1 { font-size:clamp(1.8rem,4vw,3.2rem); }
+
+  /* intro */
+  .intro-inner {
+    grid-template-columns:1fr;
+    gap:4rem; text-align:center;
+  }
+  .intro-stats { justify-content:center; }
+  .intro-visual { height:380px; }
+  .intro-card--1 { top:-5%; right:-8%; }
+  .intro-card--2 { bottom:-5%; left:-8%; }
+
+  /* tech */
+  .tech-grid { grid-template-columns:repeat(2,1fr); }
+
+  /* lens info */
+  .lens-info--left,
+  .lens-info--right { display:none; }
+  .lens-visual { width:min(420px,80vw); height:min(420px,80vw); }
+
+  /* features */
+  .features-layout { grid-template-columns:1fr; }
+  .features-list {
+    flex-direction:row; flex-wrap:wrap;
+    justify-content:center; gap:.5rem;
+  }
+  .feature-item { padding:.8rem 1.2rem; }
+  .feature-display { min-height:360px; }
+
+  /* gallery */
+  .gallery-grid { grid-template-columns:repeat(2,1fr); grid-auto-rows:280px; }
+  .gallery-item:nth-child(2) { grid-row:span 1; }
+  .gallery-item:nth-child(5) { grid-column:span 1; }
+
+  /* components */
+  .components-3d-stage { height:auto; perspective:none; }
+
+  /* footer */
+  .footer-grid { grid-template-columns:1fr 1fr; }
+  .footer-brand { grid-column:1/-1; }
+
+  /* contact */
+  .contact-grid { grid-template-columns:1fr; gap:3rem; }
+}
+
+/* ── 768px (tablet portrait) ────────────────────────────────── */
+@media (max-width:768px) {
+  body { cursor:auto; }
+  #cursor-dot,
+  #cursor-ring,
+  #cursor-label { display:none; }
+
+  /* header */
+  #site-header { padding:1.2rem 1.5rem; }
+  #site-header.scrolled { padding:.9rem 1.5rem; }
+
+  /* hero */
+  #hero { min-height:100svh; }
+  #camera-3d { width:min(320px,80vw); height:min(320px,80vw); }
+  .hud-ring--2 { width:360px; height:360px; }
+  .hud-ring--1 { width:260px; height:260px; }
+  .hud-brackets { width:340px; height:340px; }
+  .hero-h1 { font-size:clamp(1.6rem,5vw,2.6rem); }
+  .hero-sub { font-size:.62rem; }
+
+  /* Disable cursor-based 3D on touch */
+  #camera-3d { transform:none !important; transition:none !important; }
+
+  /* intro */
+  .intro-inner { padding:0 1.5rem; }
+  .intro-heading { font-size:clamp(1.6rem,4vw,2.4rem); }
+
+  /* tech */
+  .tech-grid { grid-template-columns:1fr; }
+  .tech-inner { padding:0 1.5rem; }
+  #tech { padding:6rem 0; }
+
+  /* gallery */
+  .gallery-grid { grid-template-columns:1fr; grid-auto-rows:260px; }
+  .gallery-inner { padding:0 1.5rem; }
+  #gallery-section { padding:6rem 0; }
+
+  /* features */
+  .features-inner { padding:0 1.5rem; }
+  #features-section { padding:6rem 0; }
+
+  /* lens */
+  .lens-visual { width:min(300px,85vw); height:min(300px,85vw); }
+
+  /* aperture */
+  .aperture-wrap { width:min(320px,85vw); height:min(320px,85vw); }
+
+  /* section headers */
+  .section-title { font-size:clamp(1.4rem,4vw,2rem); }
+
+  /* page hero */
+  .page-hero { height:65vh; min-height:480px; }
+  .page-hero-title { font-size:clamp(2rem,7vw,3.5rem); }
+
+  /* contact */
+  .contact-grid { padding:0 1.5rem; }
+
+  /* footer */
+  .footer-inner { padding:0 1.5rem; }
+  .footer-grid { grid-template-columns:1fr; gap:2rem; }
+  .footer-bottom { flex-direction:column; gap:1rem; text-align:center; }
+
+  /* components */
+  .components-inner { padding:0 1.5rem; }
+
+  /* 3D effects reduction */
+  .tech-card { transform:none !important; }
+  .gallery-item { transform:none !important; }
+
+  /* mobile nav items stagger */
+  #mobile-nav a:nth-child(1) { transition-delay:.05s; }
+  #mobile-nav a:nth-child(2) { transition-delay:.1s; }
+  #mobile-nav a:nth-child(3) { transition-delay:.15s; }
+  #mobile-nav a:nth-child(4) { transition-delay:.2s; }
+  #mobile-nav a:nth-child(5) { transition-delay:.25s; }
+  #mobile-nav a:nth-child(6) { transition-delay:.3s; }
+  #mobile-nav a:nth-child(7) { transition-delay:.35s; }
+  #mobile-nav a:nth-child(8) { transition-delay:.4s; }
+}
+
+/* ── 576px (large phones) ───────────────────────────────────── */
+@media (max-width:576px) {
+  /* hero */
+  #camera-3d { width:min(280px,85vw); height:min(280px,85vw); }
+  .hud-ring--1 { width:210px; height:210px; }
+  .hud-ring--2 { width:300px; height:300px; }
+  .hud-brackets { width:290px; height:290px; }
+  .hero-h1 { font-size:clamp(1.4rem,6vw,2.2rem); }
+  .btn-hero { padding:.75rem 1.6rem; font-size:.72rem; white-space:nowrap; }
+
+  /* sections */
+  #intro,
+  #tech,
+  #lens-section,
+  #aperture-section,
+  #parallax-story,
+  #features-section,
+  #gallery-section,
+  #components-section { padding:5rem 0; }
+
+  /* story heading */
+  .story-heading { font-size:clamp(1.6rem,6vw,2.8rem); }
+
+  /* footer lens */
+  .footer-lens { display:none; }
+
+  /* gallery */
+  .gallery-grid { gap:1rem; }
+
+  /* intro cards */
+  .intro-card { display:none; }
+
+  /* hud readouts */
+  .hud-readout--tl,
+  .hud-readout--bl { display:none; }
+
+  /* zoom showcase */
+  #zoom-showcase-camera { width:min(280px,85vw); height:min(280px,85vw); }
+
+  /* contact form */
+  .contact-grid { gap:2rem; }
+}
+
+/* ── 375px (small phones) ───────────────────────────────────── */
+@media (max-width:375px) {
+  #camera-3d { width:min(240px,88vw); height:min(240px,88vw); }
+  .hero-h1  { font-size:1.4rem; }
+  .hero-sub { letter-spacing:.12em; }
+  .section-title { font-size:1.3rem; }
+  .intro-heading { font-size:1.5rem; }
+  .page-hero-title { font-size:2rem; }
+
+  .btn-cta { padding:.62rem 1.3rem; font-size:.7rem; white-space:nowrap; }
+  .btn-hero { padding:.72rem 1.5rem; white-space:nowrap; }
+
+  #mobile-nav a { font-size:1.6rem; }
+}
+
+/* ── TOUCH INTERACTION — HOVER FALLBACKS ────────────────────── */
+@media (hover:none) {
+  .tech-card:hover { transform:none; }
+  .gallery-item:hover .gallery-overlay { opacity:1; }
+  .gallery-item:hover .gallery-img,
+  .gallery-item:hover .gallery-img-placeholder { transform:none; }
+  .feature-item:hover { background:transparent; border-color:transparent; }
+  .btn-cta:hover,
+  .btn-hero:hover { transform:none; }
+}
+
+/* ── HIGH DPI / RETINA ──────────────────────────────────────── */
+@media (-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi) {
+  /* ensure crisp lines */
+  .hud-ring,
+  .lens-outer,
+  .tech-card { outline:none; }
+}
+
+/* ── PRINT ──────────────────────────────────────────────────── */
+@media print {
+  #site-header,
+  #loading-screen,
+  #cursor-dot,
+  #cursor-ring,
+  #particle-canvas,
+  .hero-scroll-hint,
+  #img-viewer { display:none; }
+  body { background:#fff; color:#000; }
+}

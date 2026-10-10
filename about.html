@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="About Lenscraft — Photography philosophy and creative story"/>
+  <title>ABOUT — LENSCRAFT</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="css/animations.css"/>
+  <link rel="stylesheet" href="css/responsive.css"/>
+</head>
+<body>
+
+<div id="loading-screen" aria-hidden="true">
+  <div class="loading-lens"><div class="loading-ring loading-ring--1"></div><div class="loading-ring loading-ring--2"></div><div class="loading-ring loading-ring--3"></div><div class="loading-dot"></div></div>
+  <div class="loading-bar-wrap"><div class="loading-bar"></div></div>
+  <p class="loading-text">FOCUSING</p>
+</div>
+
+<div id="cursor-dot" aria-hidden="true"></div>
+<div id="cursor-ring" aria-hidden="true"></div>
+<div id="cursor-label" aria-hidden="true"></div>
+<canvas id="particle-canvas" aria-hidden="true"></canvas>
+
+<header id="site-header" role="banner">
+  <a href="index.html" class="header-logo" aria-label="Lenscraft Home">
+    <div class="logo-icon" aria-hidden="true"><svg viewBox="0 0 38 38" fill="none"><circle cx="19" cy="19" r="17.5" stroke="rgba(0,212,255,0.5)" stroke-width="1"/><circle cx="19" cy="19" r="12" stroke="rgba(0,212,255,0.35)" stroke-width="1"/><circle cx="19" cy="19" r="6.5" fill="rgba(0,212,255,0.15)" stroke="rgba(0,212,255,0.6)" stroke-width="1.2"/><circle cx="19" cy="19" r="2.5" fill="#00d4ff"/></svg></div>
+    <span class="text-gradient">LENSCRAFT</span>
+  </a>
+  <nav class="header-nav" aria-label="Primary navigation">
+    <a href="index.html">Home</a><a href="camera.html">Camera</a><a href="technology.html">Technology</a>
+    <a href="lens.html">Features</a><a href="gallery.html">Gallery</a>
+    <a href="experience.html">Experience</a><a href="contact.html">Contact</a>
+  </nav>
+  <a href="experience.html" class="btn-cta magnetic"><span class="magnetic-inner">EXPLORE CAMERA</span></a>
+  <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobile-nav"><span></span><span></span><span></span></button>
+</header>
+<nav id="mobile-nav" aria-label="Mobile navigation" aria-hidden="true">
+  <button class="mobile-close" aria-label="Close navigation">✕</button>
+  <a href="index.html">Home</a><a href="camera.html">Camera</a><a href="technology.html">Technology</a>
+  <a href="lens.html">Features</a><a href="gallery.html">Gallery</a><a href="experience.html">Experience</a>
+  <a href="about.html">About</a><a href="contact.html">Contact</a>
+</nav>
+
+<!-- PAGE HERO — cinematic camera silhouette -->
+<section class="page-hero" aria-labelledby="about-hero-title">
+  <div class="page-hero-bg" style="background:radial-gradient(ellipse 70% 60% at 50% 50%,rgba(0,30,80,.3) 0%,transparent 70%),var(--clr-bg);"></div>
+  <div class="page-hero-grid" aria-hidden="true"></div>
+
+  <!-- Silhouette visual -->
+  <div class="page-hero-visual anim-hero-cam" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:.35;" aria-hidden="true">
+    <div style="position:relative;width:min(600px,80vw);">
+      <div id="camera-3d" style="width:100%;aspect-ratio:1;">
+        <div class="camera-body-wrap">
+          <div class="camera-glow" style="opacity:1.5;"></div>
+          <div class="camera-svg-wrap"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-hero-content">
+    <div class="section-label anim-hero-1" style="justify-content:center;"><span class="neon-dot"></span>OUR STORY</div>
+    <h1 id="about-hero-title" class="page-hero-title anim-hero-2">
+      THE <span class="text-gradient">PHILOSOPHY</span>
+    </h1>
+    <p class="page-hero-sub anim-hero-3">VISION · CRAFT · PERSPECTIVE · LIGHT</p>
+    <p class="page-hero-desc anim-hero-4">Photography is not a record of what was — it is a translation of what was felt.</p>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- PHILOSOPHY SECTION -->
+<section style="padding:8rem 0;" aria-labelledby="phil-heading">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6rem;align-items:center;">
+      <div class="reveal-left">
+        <div class="section-label"><span class="neon-dot"></span>PHILOSOPHY</div>
+        <h2 id="phil-heading" class="intro-heading mt-sm">THE <span class="text-gradient">ART</span><br/>OF SEEING</h2>
+        <p class="intro-body mt-md">
+          Before the camera. Before the lens. Before the light — there is intention.
+          The photographer's eye selects from infinite possibility the one frame that
+          contains the truth of a moment.
+        </p>
+        <p class="intro-body mt-sm">
+          We built Lenscraft around a single belief: that the best camera is the one that
+          disappears. The one whose operation becomes so intuitive, so transparent,
+          that all that remains is the act of seeing.
+        </p>
+        <p class="intro-body mt-sm">
+          Technology serves vision. Never the reverse.
+        </p>
+      </div>
+      <div class="reveal-right" style="position:relative;">
+        <!-- Large quote display -->
+        <div class="glass-panel" style="padding:3rem;position:relative;overflow:hidden;">
+          <div aria-hidden="true" style="font-family:var(--font-head);font-size:8rem;font-weight:900;color:rgba(0,212,255,.04);position:absolute;top:-1rem;left:1rem;line-height:1;">"</div>
+          <blockquote style="font-family:var(--font-head);font-size:1.5rem;font-weight:600;line-height:1.4;color:var(--clr-white);font-style:italic;position:relative;z-index:1;">
+            The camera is an instrument that teaches people how to see without a camera.
+          </blockquote>
+          <cite style="display:block;margin-top:1rem;font-family:var(--font-mono);font-size:.65rem;letter-spacing:.2em;color:var(--clr-blue);text-transform:uppercase;">— Dorothea Lange</cite>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- VALUES -->
+<section style="padding:8rem 0;position:relative;overflow:hidden;" aria-labelledby="values-heading">
+  <div aria-hidden="true" style="position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 50% 100%,rgba(124,58,237,.08) 0%,transparent 70%);pointer-events:none;"></div>
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-label"><span class="neon-dot" style="background:var(--clr-violet-light);box-shadow:var(--glow-violet);"></span>CORE VALUES</div>
+      <h2 id="values-heading" class="section-title mt-sm">WHAT <span class="text-gradient">DRIVES US</span></h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:4rem;">
+      <article class="tech-card reveal reveal-delay-1" data-tilt="10">
+        <div class="tech-card-glow"></div>
+        <div class="tech-card-icon" aria-hidden="true"><svg viewBox="0 0 52 52" fill="none"><circle cx="26" cy="26" r="22" stroke="rgba(0,212,255,0.3)" stroke-width="1.5"/><path d="M16 26 L22 32 L36 18" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h3 class="tech-card-title">Precision</h3>
+        <p class="tech-card-body">Every optical element ground to within nanometres. Every autofocus algorithm refined over millions of real-world frames. Precision is not a feature — it is the foundation.</p>
+        <span class="tech-card-number" aria-hidden="true">01</span>
+      </article>
+      <article class="tech-card reveal reveal-delay-2" data-tilt="10">
+        <div class="tech-card-glow"></div>
+        <div class="tech-card-icon" aria-hidden="true"><svg viewBox="0 0 52 52" fill="none"><path d="M26 8 L32 20 L46 22 L36 32 L38 46 L26 40 L14 46 L16 32 L6 22 L20 20 Z" stroke="rgba(0,212,255,0.5)" stroke-width="1.5" fill="rgba(0,212,255,0.06)" stroke-linejoin="round"/></svg></div>
+        <h3 class="tech-card-title">Clarity</h3>
+        <p class="tech-card-body">Not just optical clarity — the clarity of purpose. A camera that shows you exactly what you need to see, when you need to see it, without distraction or ambiguity.</p>
+        <span class="tech-card-number" aria-hidden="true">02</span>
+      </article>
+      <article class="tech-card reveal reveal-delay-3" data-tilt="10">
+        <div class="tech-card-glow"></div>
+        <div class="tech-card-icon" aria-hidden="true"><svg viewBox="0 0 52 52" fill="none"><path d="M26 8 C36 8 44 16 44 26 C44 38 34 46 26 46 C18 46 8 38 8 26 C8 16 16 8 26 8 Z" stroke="rgba(0,212,255,0.4)" stroke-width="1.5" fill="rgba(0,212,255,0.06)"/><path d="M20 26 Q26 16 32 26" stroke="#00d4ff" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+        <h3 class="tech-card-title">Creativity</h3>
+        <p class="tech-card-body">Technology that expands creative possibility, not constrains it. Every specification exists to remove a barrier between your vision and its expression.</p>
+        <span class="tech-card-number" aria-hidden="true">03</span>
+      </article>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- TEAM / STORY TIMELINE -->
+<section style="padding:8rem 0;" aria-labelledby="story-timeline-heading">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-label"><span class="neon-dot"></span>THE JOURNEY</div>
+      <h2 id="story-timeline-heading" class="section-title mt-sm">OUR <span class="text-gradient">STORY</span></h2>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:0;margin-top:4rem;position:relative;">
+      <!-- spine line -->
+      <div aria-hidden="true" style="position:absolute;left:calc(50% - .5px);top:0;bottom:0;width:1px;background:linear-gradient(to bottom,transparent,rgba(0,212,255,.25),transparent);"></div>
+
+      <!-- Timeline items -->
+      <div style="display:grid;grid-template-columns:1fr 60px 1fr;gap:1rem;align-items:center;margin-bottom:3rem;" class="reveal">
+        <div class="glass-panel" style="padding:1.8rem;text-align:right;">
+          <div style="font-family:var(--font-mono);font-size:.6rem;letter-spacing:.2em;color:var(--clr-blue);margin-bottom:.5rem;">2018</div>
+          <h3 style="font-family:var(--font-head);font-size:1rem;font-weight:700;margin-bottom:.5rem;">THE CONCEPT</h3>
+          <p style="font-size:.82rem;color:var(--clr-grey);">The idea of a camera experience that could communicate the feeling of a zoom, not just demonstrate it technically.</p>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:center;" aria-hidden="true">
+          <div style="width:14px;height:14px;border-radius:50%;background:var(--clr-blue);box-shadow:var(--glow-blue);"></div>
+        </div>
+        <div></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 60px 1fr;gap:1rem;align-items:center;margin-bottom:3rem;" class="reveal">
+        <div></div>
+        <div style="display:flex;align-items:center;justify-content:center;" aria-hidden="true">
+          <div style="width:14px;height:14px;border-radius:50%;background:var(--clr-violet-light);box-shadow:var(--glow-violet);"></div>
+        </div>
+        <div class="glass-panel" style="padding:1.8rem;">
+          <div style="font-family:var(--font-mono);font-size:.6rem;letter-spacing:.2em;color:var(--clr-violet-light);margin-bottom:.5rem;">2020</div>
+          <h3 style="font-family:var(--font-head);font-size:1rem;font-weight:700;margin-bottom:.5rem;">FIRST PROTOTYPE</h3>
+          <p style="font-size:.82rem;color:var(--clr-grey);">The first interactive 3D camera experience demonstrated at a photography summit. Response was overwhelming.</p>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 60px 1fr;gap:1rem;align-items:center;margin-bottom:3rem;" class="reveal">
+        <div class="glass-panel" style="padding:1.8rem;text-align:right;">
+          <div style="font-family:var(--font-mono);font-size:.6rem;letter-spacing:.2em;color:var(--clr-blue);margin-bottom:.5rem;">2022</div>
+          <h3 style="font-family:var(--font-head);font-size:1rem;font-weight:700;margin-bottom:.5rem;">THE SYSTEM</h3>
+          <p style="font-size:.82rem;color:var(--clr-grey);">Full lens ecosystem developed. Six prime lenses and three zoom lenses designed and manufactured from the ground up.</p>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:center;" aria-hidden="true">
+          <div style="width:14px;height:14px;border-radius:50%;background:var(--clr-blue);box-shadow:var(--glow-blue);"></div>
+        </div>
+        <div></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 60px 1fr;gap:1rem;align-items:center;" class="reveal">
+        <div></div>
+        <div style="display:flex;align-items:center;justify-content:center;" aria-hidden="true">
+          <div style="width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,var(--clr-blue),var(--clr-violet-light));box-shadow:var(--glow-blue);animation:glow-pulse 2s ease-in-out infinite alternate;"></div>
+        </div>
+        <div class="glass-panel" style="padding:1.8rem;border-color:rgba(0,212,255,.3);">
+          <div style="font-family:var(--font-mono);font-size:.6rem;letter-spacing:.2em;color:var(--clr-blue);margin-bottom:.5rem;">2026 — NOW</div>
+          <h3 style="font-family:var(--font-head);font-size:1rem;font-weight:700;margin-bottom:.5rem;" class="text-gradient">LENSCRAFT LAUNCH</h3>
+          <p style="font-size:.82rem;color:var(--clr-grey);">The complete cinematic camera zoom experience — available to every photographer and filmmaker who sees beyond the frame.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section style="padding:6rem 0;text-align:center;" aria-labelledby="about-cta-heading">
+  <div class="container reveal">
+    <div class="section-label" style="justify-content:center;margin-bottom:1rem;"><span class="neon-dot"></span>START YOUR JOURNEY</div>
+    <h2 id="about-cta-heading" class="section-title">SEE BEYOND <span class="text-gradient">THE FRAME</span></h2>
+    <p style="color:var(--clr-grey);max-width:460px;margin:1rem auto 2rem;font-size:.9rem;">Enter the full cinematic camera zoom experience and discover what it means to see with a camera.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+      <a href="experience.html" class="btn-hero magnetic" style="display:inline-flex;"><span class="magnetic-inner">BEGIN EXPERIENCE <svg class="arrow" viewBox="0 0 18 18" fill="none"><path d="M3 9h12M10 4l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+      <a href="contact.html" class="btn-cta magnetic" style="display:inline-block;"><span class="magnetic-inner">CONTACT US</span></a>
+    </div>
+  </div>
+</section>
+
+<footer id="site-footer" role="contentinfo">
+  <div class="footer-lens" aria-hidden="true"></div>
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo"><svg width="32" height="32" viewBox="0 0 38 38" fill="none" aria-hidden="true"><circle cx="19" cy="19" r="17.5" stroke="rgba(0,212,255,0.5)" stroke-width="1"/><circle cx="19" cy="19" r="5" fill="rgba(0,212,255,0.2)" stroke="rgba(0,212,255,0.6)" stroke-width="1.2"/><circle cx="19" cy="19" r="2" fill="#00d4ff"/></svg><span class="text-gradient">LENSCRAFT</span></div>
+        <p class="footer-tagline">An immersive cinematic camera zoom experience. Explore depth, focus, and the art of optical perspective.</p>
+      </div>
+      <div class="footer-col"><h4>Navigation</h4><ul><li><a href="index.html">Home</a></li><li><a href="camera.html">Camera</a></li><li><a href="lens.html">Lens</a></li><li><a href="technology.html">Technology</a></li><li><a href="gallery.html">Gallery</a></li><li><a href="experience.html">Experience</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="about.html">Philosophy</a></li><li><a href="about.html">Our Story</a></li><li><a href="about.html">Values</a></li><li><a href="contact.html">Contact</a></li></ul></div>
+      <div class="footer-newsletter footer-col"><h4>Newsletter</h4><p style="font-size:.8rem;color:var(--clr-grey);margin-bottom:1rem;">Stay inspired with our latest stories.</p><div class="footer-newsletter"><input type="email" placeholder="YOUR EMAIL ADDRESS" aria-label="Email"/><button class="btn-cta"><span>SUBSCRIBE</span></button></div></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">© 2026 LENSCRAFT CAMERA EXPERIENCE. ALL RIGHTS RESERVED.</p>
+      <button class="btn-top" aria-label="Back to top"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 14V4M4 9l5-5 5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+  </div>
+</footer>
+
+<script src="js/particles.js"></script>
+<script src="js/cursor.js"></script>
+<script src="js/camera-3d.js"></script>
+<script src="js/scroll.js"></script>
+<script src="js/gallery.js"></script>
+<script src="js/gallery-images.js"></script>`n<script src="js/main.js"></script>
+</body>
+</html>

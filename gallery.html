@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Interactive 3D Photography Gallery — Camera Zoom Experience"/>
+  <title>GALLERY — LENSCRAFT</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="css/animations.css"/>
+  <link rel="stylesheet" href="css/responsive.css"/>
+  <style>
+    /* ── Gallery-page-specific styles ── */
+    .gallery-filter-bar {
+      display:flex; align-items:center; gap:.8rem;
+      flex-wrap:wrap; margin-bottom:3rem;
+    }
+    .gallery-filter-btn {
+      font-family:var(--font-head); font-size:.72rem; font-weight:600;
+      letter-spacing:.18em; text-transform:uppercase;
+      padding:.55rem 1.3rem; border:1px solid var(--clr-glass-border);
+      color:var(--clr-grey); border-radius:2px; cursor:none;
+      transition:all var(--dur-med) var(--ease-out);
+      background:var(--clr-glass);
+    }
+    .gallery-filter-btn:hover,
+    .gallery-filter-btn.active {
+      border-color:var(--clr-blue); color:var(--clr-blue);
+      box-shadow:var(--glow-blue); background:rgba(0,212,255,.05);
+    }
+    /* Full gallery grid — more items, varied sizes */
+    .gallery-grid-full {
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      grid-auto-rows:280px;
+      gap:1.5rem;
+    }
+    .gallery-grid-full .gallery-item:nth-child(1) { grid-column:span 2; }
+    .gallery-grid-full .gallery-item:nth-child(4) { grid-row:span 2; }
+    .gallery-grid-full .gallery-item:nth-child(7) { grid-column:span 2; }
+    .gallery-grid-full .gallery-item:nth-child(10){ grid-row:span 2; }
+
+    /* featured large item */
+    .gallery-featured {
+      position:relative; overflow:hidden; border-radius:4px;
+      height:500px; cursor:none; margin-bottom:1.5rem;
+      transform-style:preserve-3d;
+      transition:box-shadow var(--dur-med);
+    }
+    .gallery-featured:hover {
+      box-shadow:0 20px 60px rgba(0,0,0,.7),0 0 0 1px rgba(0,212,255,.2),var(--glow-blue);
+    }
+    .gallery-featured .gallery-overlay { opacity:0; transition:opacity .4s; }
+    .gallery-featured:hover .gallery-overlay { opacity:1; }
+    .gallery-featured-title {
+      font-family:var(--font-head); font-size:2rem; font-weight:700;
+      text-transform:uppercase; margin-bottom:.4rem;
+    }
+
+    /* masonry caption strip */
+    .gallery-strip {
+      display:flex; gap:1.5rem; overflow-x:auto;
+      padding-bottom:1rem; scrollbar-width:none;
+      -webkit-overflow-scrolling:touch;
+    }
+    .gallery-strip::-webkit-scrollbar { display:none; }
+    .gallery-strip-item {
+      flex:0 0 200px; height:140px; border-radius:4px;
+      overflow:hidden; cursor:none; position:relative;
+      transition:box-shadow var(--dur-med), transform var(--dur-med);
+    }
+    .gallery-strip-item:hover {
+      transform:translateY(-4px) scale(1.03);
+      box-shadow:0 10px 30px rgba(0,0,0,.6),var(--glow-blue);
+    }
+
+    /* category badge */
+    .gallery-badge {
+      position:absolute; top:.8rem; left:.8rem;
+      font-family:var(--font-mono); font-size:.58rem; letter-spacing:.2em;
+      text-transform:uppercase; color:var(--clr-blue);
+      background:rgba(0,8,20,.8); border:1px solid rgba(0,212,255,.3);
+      padding:.25rem .6rem; border-radius:2px; z-index:5;
+    }
+  </style>
+</head>
+<body>
+
+<div id="loading-screen" aria-hidden="true">
+  <div class="loading-lens"><div class="loading-ring loading-ring--1"></div><div class="loading-ring loading-ring--2"></div><div class="loading-ring loading-ring--3"></div><div class="loading-dot"></div></div>
+  <div class="loading-bar-wrap"><div class="loading-bar"></div></div>
+  <p class="loading-text">DEVELOPING PHOTOGRAPHS</p>
+</div>
+
+<div id="cursor-dot" aria-hidden="true"></div>
+<div id="cursor-ring" aria-hidden="true"></div>
+<div id="cursor-label" aria-hidden="true"></div>
+<canvas id="particle-canvas" aria-hidden="true"></canvas>
+
+<header id="site-header" role="banner">
+  <a href="index.html" class="header-logo" aria-label="Lenscraft Home">
+    <div class="logo-icon" aria-hidden="true"><svg viewBox="0 0 38 38" fill="none"><circle cx="19" cy="19" r="17.5" stroke="rgba(0,212,255,0.5)" stroke-width="1"/><circle cx="19" cy="19" r="12" stroke="rgba(0,212,255,0.35)" stroke-width="1"/><circle cx="19" cy="19" r="6.5" fill="rgba(0,212,255,0.15)" stroke="rgba(0,212,255,0.6)" stroke-width="1.2"/><circle cx="19" cy="19" r="2.5" fill="#00d4ff"/></svg></div>
+    <span class="text-gradient">LENSCRAFT</span>
+  </a>
+  <nav class="header-nav" aria-label="Primary navigation">
+    <a href="index.html">Home</a><a href="camera.html">Camera</a><a href="technology.html">Technology</a>
+    <a href="lens.html">Features</a><a href="gallery.html" class="active">Gallery</a>
+    <a href="experience.html">Experience</a><a href="contact.html">Contact</a>
+  </nav>
+  <a href="experience.html" class="btn-cta magnetic"><span class="magnetic-inner">EXPLORE CAMERA</span></a>
+  <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobile-nav"><span></span><span></span><span></span></button>
+</header>
+<nav id="mobile-nav" aria-label="Mobile navigation" aria-hidden="true">
+  <button class="mobile-close" aria-label="Close navigation">✕</button>
+  <a href="index.html">Home</a><a href="camera.html">Camera</a><a href="technology.html">Technology</a>
+  <a href="lens.html">Features</a><a href="gallery.html">Gallery</a><a href="experience.html">Experience</a>
+  <a href="about.html">About</a><a href="contact.html">Contact</a>
+</nav>
+
+<!-- PAGE HERO — floating frames -->
+<section class="page-hero" aria-labelledby="gallery-hero-title">
+  <div class="page-hero-bg"></div>
+  <div class="page-hero-grid" aria-hidden="true"></div>
+
+  <!-- Floating frames in background -->
+  <div aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;overflow:hidden;">
+    <div class="glass-panel anim-hero-1" style="position:absolute;width:160px;height:110px;top:18%;left:8%;border-radius:4px;transform:rotate(-6deg);overflow:hidden;">
+      <div data-scene="golden" style="width:100%;height:100%;"></div>
+    </div>
+    <div class="glass-panel anim-hero-2" style="position:absolute;width:130px;height:90px;top:55%;left:5%;border-radius:4px;transform:rotate(4deg);overflow:hidden;">
+      <div data-scene="nebula" style="width:100%;height:100%;"></div>
+    </div>
+    <div class="glass-panel anim-hero-1" style="position:absolute;width:180px;height:120px;top:20%;right:7%;border-radius:4px;transform:rotate(5deg);overflow:hidden;">
+      <div data-scene="forest" style="width:100%;height:100%;"></div>
+    </div>
+    <div class="glass-panel anim-hero-2" style="position:absolute;width:140px;height:95px;top:60%;right:6%;border-radius:4px;transform:rotate(-4deg);overflow:hidden;">
+      <div data-scene="ocean" style="width:100%;height:100%;"></div>
+    </div>
+  </div>
+
+  <div class="page-hero-content">
+    <div class="section-label anim-hero-1" style="justify-content:center;"><span class="neon-dot"></span>PHOTOGRAPHY GALLERY</div>
+    <h1 id="gallery-hero-title" class="page-hero-title anim-hero-2">
+      <span class="text-gradient">FRAMES</span><br/>IN 3D SPACE
+    </h1>
+    <p class="page-hero-sub anim-hero-3">HOVER · TILT · EXPLORE · VIEW</p>
+    <p class="page-hero-desc anim-hero-4">An interactive collection of photography captured through the lens. Every image responds to your cursor.</p>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- GALLERY MAIN -->
+<section style="padding:6rem 0;" aria-labelledby="gallery-main-heading">
+  <div class="gallery-inner">
+
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:3rem;flex-wrap:wrap;gap:1.5rem;">
+      <div>
+        <div class="section-label reveal"><span class="neon-dot"></span>CURATED COLLECTION</div>
+        <h2 id="gallery-main-heading" class="section-title mt-sm reveal reveal-delay-1">THE <span class="text-gradient">ARCHIVE</span></h2>
+      </div>
+      <div class="gallery-filter-bar reveal reveal-delay-2" role="group" aria-label="Gallery filters">
+        <button class="gallery-filter-btn active" data-filter="all">ALL</button>
+        <button class="gallery-filter-btn" data-filter="urban">URBAN</button>
+        <button class="gallery-filter-btn" data-filter="nature">NATURE</button>
+        <button class="gallery-filter-btn" data-filter="astro">ASTRO</button>
+        <button class="gallery-filter-btn" data-filter="portrait">PORTRAIT</button>
+        <button class="gallery-filter-btn" data-filter="abstract">ABSTRACT</button>
+      </div>
+    </div>
+
+    <!-- Featured large item -->
+    <div class="gallery-featured reveal" data-scene="cityscape" data-category="urban" role="button" tabindex="0" aria-label="View: Cityscape at dusk">
+      <div class="gallery-img-placeholder"></div>
+      <div class="gallery-badge">URBAN</div>
+      <div class="gallery-light-reflect" aria-hidden="true"></div>
+      <div class="gallery-overlay">
+        <div class="gallery-featured-title">CITYSCAPE AT DUSK</div>
+        <div class="gallery-overlay-sub">24mm · f/8 · ISO 200 · 4 sec</div>
+        <p style="font-size:.8rem;color:rgba(255,255,255,.6);margin-top:.5rem;max-width:420px;">
+          Long-exposure city lights trail against the deep blue of civil twilight.
+          The compression of a 24mm wide-angle renders the entire skyline in razor-sharp detail.
+        </p>
+      </div>
+    </div>
+
+    <!-- Main grid -->
+    <div class="gallery-grid-full" role="list">
+
+      <div class="gallery-item reveal reveal-delay-1" data-scene="nebula" data-category="astro" role="listitem">
+        <div class="gallery-img-placeholder"></div>
+        <div class="gallery-badge">ASTRO</div>
+        <div class="gallery-light-reflect" aria-hidden="true"></div>
+        <div class="gallery-overlay">
+          <div class="gallery-overlay-title">NEBULA CLOSE-UP</div>
+          <div class="gallery-overlay-sub">200mm · f/2.8 · ISO 3200</div>
+        </div>
+      </div>
+
+      <div class="gallery-item reveal reveal-delay-2" data-scene="forest" data-category="nature" role="listitem">
+        <div class="gallery-img-placeholder"></div>
+        <div class="gallery-badge">NATURE</div>
+        <div class="gallery-light-reflect" aria-hidden="true"></div>
+        <div class="gallery-overlay">
+          <div class="gallery-overlay-title">FOREST DEPTH</div>
+          <div class="gallery-overlay-sub">50mm · f/1.8 · ISO 800</div>
+        </div>
+      </div>
+
+      <div class="gallery-item reveal reveal-delay-3" data-scene="golden" data-category="nature" role="listitem">
+        <div class="gallery-img-placeholder"></div>
+        <div class="gallery-badge">NATURE</div>
+        <div class="gallery-light-reflect" aria-hidden="true"></div>
+        <div class="gallery-overlay">
+          <div class="gallery-overlay-title">GOLDEN HOUR</div>
+          <div class="gallery-overlay-sub">85mm · f/1.4 · ISO 400</div>
+        </div>
+      </div>
+
+      <div class="gallery-item reveal reveal-delay-1" data-scene="ocean" data-category="urban" role="listitem">
+        <div class="gallery-img-placeholder"></div>
+        <div class="gallery-badge">URBAN</div>
+        <div class="gallery-light-reflect" aria-hidden="true"></div>
+        <div class="gallery-overlay">
+          <div class="gallery-overlay-title">OCEAN LENS FLARE</div>
+          <div class="gallery-overlay-sub">35mm · f/11 · ISO 100</div>
+        </div>
+      </div>
+
+      <div class="gallery-item reveal reveal-delay-2" data-scene="architecture" data-category="urban" role="listitem">
+        <div class="gallery-img-placeholder"></div>
+        <div class="gallery-badge">URBAN</div>
+        <div class="gallery-light-reflect" aria-hidden="true"></div>
+        <div class="gallery-overlay">
+          <div class="gallery-overlay-title">NIGHT ARCHITECTURE</div>
+          <div class="gallery-overlay-sub">16mm · f/4 · ISO 1600</div>
+        </div>
+      </div>
+
+      <div class="gallery-item reveal reveal-delay-3" data-scene="portrait" data-category="portrait" role="listitem">
+        <div class="gallery-img-placeholder"></div>
+        <div class="gallery-badge">PORTRAIT</div>
+        <div class="gallery-light-reflect" aria-hidden="true"></div>
+        <div class="gallery-overlay">
+          <div class="gallery-overlay-title">STUDIO LIGHT</div>
+          <div class="gallery-overlay-sub">85mm · f/1.2 · ISO 200</div>
+        </div>
+      </div>
+
+      <div class="gallery-item reveal reveal-delay-1" data-scene="bokeh" data-category="abstract" role="listitem">
+        <div class="gallery-img-placeholder"></div>
+        <div class="gallery-badge">ABSTRACT</div>
+        <div class="gallery-light-reflect" aria-hidden="true"></div>
+        <div class="gallery-overlay">
+          <div class="gallery-overlay-title">LENS BOKEH</div>
+          <div class="gallery-overlay-sub">135mm · f/1.8 · ISO 3200</div>
+        </div>
+      </div>
+
+      <div class="gallery-item reveal reveal-delay-2" data-scene="milkyway" data-category="astro" role="listitem">
+        <div class="gallery-img-placeholder"></div>
+        <div class="gallery-badge">ASTRO</div>
+        <div class="gallery-light-reflect" aria-hidden="true"></div>
+        <div class="gallery-overlay">
+          <div class="gallery-overlay-title">MILKY WAY CORE</div>
+          <div class="gallery-overlay-sub">14mm · f/1.8 · ISO 6400</div>
+        </div>
+      </div>
+
+      <div class="gallery-item reveal reveal-delay-3" data-scene="arctic" data-category="nature" role="listitem">
+        <div class="gallery-img-placeholder"></div>
+        <div class="gallery-badge">NATURE</div>
+        <div class="gallery-light-reflect" aria-hidden="true"></div>
+        <div class="gallery-overlay">
+          <div class="gallery-overlay-title">ARCTIC REFLECTION</div>
+          <div class="gallery-overlay-sub">24mm · f/11 · ISO 64</div>
+        </div>
+      </div>
+
+      <div class="gallery-item reveal reveal-delay-1" data-scene="portrait2" data-category="portrait" role="listitem">
+        <div class="gallery-img-placeholder"></div>
+        <div class="gallery-badge">PORTRAIT</div>
+        <div class="gallery-light-reflect" aria-hidden="true"></div>
+        <div class="gallery-overlay">
+          <div class="gallery-overlay-title">CINEMATIC PORTRAIT</div>
+          <div class="gallery-overlay-sub">50mm · f/1.4 · ISO 400</div>
+        </div>
+      </div>
+
+      <div class="gallery-item reveal reveal-delay-2" data-scene="diffraction" data-category="abstract" role="listitem">
+        <div class="gallery-img-placeholder"></div>
+        <div class="gallery-badge">ABSTRACT</div>
+        <div class="gallery-light-reflect" aria-hidden="true"></div>
+        <div class="gallery-overlay">
+          <div class="gallery-overlay-title">DIFFRACTION</div>
+          <div class="gallery-overlay-sub">100mm · f/2.8 · ISO 100</div>
+        </div>
+      </div>
+
+      <div class="gallery-item reveal reveal-delay-3" data-scene="rain" data-category="urban" role="listitem">
+        <div class="gallery-img-placeholder"></div>
+        <div class="gallery-badge">URBAN</div>
+        <div class="gallery-light-reflect" aria-hidden="true"></div>
+        <div class="gallery-overlay">
+          <div class="gallery-overlay-title">RAIN REFLECTIONS</div>
+          <div class="gallery-overlay-sub">35mm · f/2.8 · ISO 800</div>
+        </div>
+      </div>
+
+    </div><!-- /gallery-grid-full -->
+
+  </div>
+</section>
+
+<!-- THUMBNAIL STRIP -->
+<section style="padding:4rem 0 6rem;" aria-label="Quick preview strip">
+  <div class="gallery-inner">
+    <div class="section-label reveal" style="margin-bottom:1.5rem;"><span class="neon-dot"></span>QUICK VIEW</div>
+    <div class="gallery-strip reveal reveal-delay-1" role="list">
+      <div class="gallery-strip-item" role="listitem" data-scene="cityscape"></div>
+      <div class="gallery-strip-item" role="listitem" data-scene="nebula"></div>
+      <div class="gallery-strip-item" role="listitem" data-scene="forest"></div>
+      <div class="gallery-strip-item" role="listitem" data-scene="golden"></div>
+      <div class="gallery-strip-item" role="listitem" data-scene="ocean"></div>
+      <div class="gallery-strip-item" role="listitem" data-scene="architecture"></div>
+      <div class="gallery-strip-item" role="listitem" data-scene="portrait"></div>
+      <div class="gallery-strip-item" role="listitem" data-scene="bokeh"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Fullscreen viewer -->
+<div id="img-viewer" role="dialog" aria-modal="true" aria-label="Image viewer" aria-hidden="true">
+  <img src="" alt="Gallery image" style="transition:opacity .2s,transform .3s;"/>
+  <button class="viewer-close" aria-label="Close viewer">✕</button>
+  <button class="viewer-arrow viewer-arrow--prev" aria-label="Previous image">&#8592;</button>
+  <button class="viewer-arrow viewer-arrow--next" aria-label="Next image">&#8594;</button>
+  <div class="viewer-counter" aria-live="polite">01 / 12</div>
+</div>
+
+<footer id="site-footer" role="contentinfo">
+  <div class="footer-lens" aria-hidden="true"></div>
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo"><svg width="32" height="32" viewBox="0 0 38 38" fill="none" aria-hidden="true"><circle cx="19" cy="19" r="17.5" stroke="rgba(0,212,255,0.5)" stroke-width="1"/><circle cx="19" cy="19" r="5" fill="rgba(0,212,255,0.2)" stroke="rgba(0,212,255,0.6)" stroke-width="1.2"/><circle cx="19" cy="19" r="2" fill="#00d4ff"/></svg><span class="text-gradient">LENSCRAFT</span></div>
+        <p class="footer-tagline">An immersive cinematic camera zoom experience. Explore depth, focus, and the art of optical perspective.</p>
+      </div>
+      <div class="footer-col"><h4>Navigation</h4><ul><li><a href="index.html">Home</a></li><li><a href="camera.html">Camera</a></li><li><a href="lens.html">Lens</a></li><li><a href="technology.html">Technology</a></li><li><a href="gallery.html">Gallery</a></li><li><a href="experience.html">Experience</a></li></ul></div>
+      <div class="footer-col"><h4>Gallery</h4><ul><li><a href="gallery.html">Urban</a></li><li><a href="gallery.html">Nature</a></li><li><a href="gallery.html">Astro</a></li><li><a href="gallery.html">Portrait</a></li><li><a href="gallery.html">Abstract</a></li></ul></div>
+      <div class="footer-newsletter footer-col"><h4>Newsletter</h4><p style="font-size:.8rem;color:var(--clr-grey);margin-bottom:1rem;">Stay updated with our latest galleries.</p><div class="footer-newsletter"><input type="email" placeholder="YOUR EMAIL ADDRESS" aria-label="Email"/><button class="btn-cta"><span>SUBSCRIBE</span></button></div></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">© 2026 LENSCRAFT CAMERA EXPERIENCE. ALL RIGHTS RESERVED.</p>
+      <button class="btn-top" aria-label="Back to top"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 14V4M4 9l5-5 5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+  </div>
+</footer>
+
+<script src="js/particles.js"></script>
+<script src="js/cursor.js"></script>
+<script src="js/camera-3d.js"></script>
+<script src="js/scroll.js"></script>
+<script src="js/gallery.js"></script>
+<script src="js/gallery-images.js"></script>
+<script src="js/main.js"></script>
+<script>
+// Gallery filter behaviour
+document.addEventListener('DOMContentLoaded', () => {
+  const btns  = document.querySelectorAll('.gallery-filter-btn');
+  const items = document.querySelectorAll('.gallery-grid-full .gallery-item, .gallery-featured');
+
+  btns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      btns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filter = btn.dataset.filter;
+      items.forEach(item => {
+        const cat = item.dataset.category || 'all';
+        const show = filter === 'all' || cat === filter;
+        item.style.transition = 'opacity .4s, transform .4s';
+        item.style.opacity   = show ? '1' : '0.12';
+        item.style.transform = show ? '' : 'scale(0.96)';
+        item.style.pointerEvents = show ? 'auto' : 'none';
+      });
+    });
+  });
+});
+</script>
+</body>
+</html>

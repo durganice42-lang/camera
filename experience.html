@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Interactive Camera Experience — Scroll-driven cinematic zoom journey"/>
+  <title>EXPERIENCE — LENSCRAFT</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="css/animations.css"/>
+  <link rel="stylesheet" href="css/responsive.css"/>
+  <style>
+    /* ── Experience-page-specific styles ── */
+
+    /* Chapter system */
+    .chapter {
+      position:relative; min-height:100vh;
+      display:flex; align-items:center; justify-content:center;
+      overflow:hidden;
+    }
+    .chapter-number {
+      position:absolute; top:4rem; left:5%;
+      font-family:var(--font-mono); font-size:.65rem; letter-spacing:.3em;
+      color:rgba(0,212,255,.5); text-transform:uppercase;
+    }
+    .chapter-number strong {
+      font-family:var(--font-head); font-size:4rem; font-weight:900;
+      display:block; line-height:1; color:rgba(0,212,255,.06);
+      margin-top:-.5rem;
+    }
+    .chapter-content {
+      max-width:700px; text-align:center; padding:2rem;
+      position:relative; z-index:5;
+    }
+    .chapter-title {
+      font-family:var(--font-head); font-size:clamp(2.2rem,5vw,4.5rem);
+      font-weight:900; text-transform:uppercase; letter-spacing:.05em;
+      line-height:1.05; margin-bottom:1.5rem;
+    }
+    .chapter-body {
+      font-size:1rem; color:var(--clr-grey); line-height:1.9;
+      max-width:560px; margin:0 auto;
+    }
+    .chapter-visual {
+      position:absolute; inset:0; pointer-events:none;
+      display:flex; align-items:center; justify-content:center;
+    }
+
+    /* Timeline spine */
+    .timeline-spine {
+      position:fixed; right:3rem; top:50%; transform:translateY(-50%);
+      z-index:50; display:flex; flex-direction:column; gap:.8rem;
+      pointer-events:none;
+    }
+    .timeline-dot {
+      width:8px; height:8px; border-radius:50%;
+      border:1.5px solid rgba(0,212,255,.35);
+      transition:all .3s; pointer-events:auto; cursor:none;
+    }
+    .timeline-dot.active {
+      background:var(--clr-blue); border-color:var(--clr-blue);
+      box-shadow:var(--glow-blue);
+    }
+
+    /* Progress bar (left edge) */
+    #exp-progress-bar {
+      position:fixed; left:0; top:0; width:2px;
+      background:linear-gradient(to bottom,var(--clr-blue),var(--clr-violet));
+      z-index:100; transform-origin:top;
+      box-shadow:var(--glow-blue);
+      transition:height .1s linear;
+    }
+
+    /* Chapter divider line */
+    .chapter-divider {
+      position:absolute; bottom:0; left:10%; right:10%; height:1px;
+      background:linear-gradient(90deg,transparent,rgba(0,212,255,.15),transparent);
+    }
+
+    /* Zoom number display */
+    .zoom-readout {
+      font-family:var(--font-mono); font-size:.65rem;
+      letter-spacing:.25em; color:var(--clr-blue); text-transform:uppercase;
+      display:flex; align-items:center; gap:1rem; justify-content:center;
+      margin-top:2rem;
+    }
+    .zoom-readout-num {
+      font-family:var(--font-head); font-size:2.5rem; font-weight:700;
+      line-height:1;
+    }
+  </style>
+</head>
+<body>
+
+<div id="loading-screen" aria-hidden="true">
+  <div class="loading-lens"><div class="loading-ring loading-ring--1"></div><div class="loading-ring loading-ring--2"></div><div class="loading-ring loading-ring--3"></div><div class="loading-dot"></div></div>
+  <div class="loading-bar-wrap"><div class="loading-bar"></div></div>
+  <p class="loading-text">PREPARING EXPERIENCE</p>
+</div>
+
+<div id="cursor-dot" aria-hidden="true"></div>
+<div id="cursor-ring" aria-hidden="true"></div>
+<div id="cursor-label" aria-hidden="true"></div>
+<canvas id="particle-canvas" aria-hidden="true"></canvas>
+
+<!-- Experience progress bar -->
+<div id="exp-progress-bar" aria-hidden="true" style="height:0%;"></div>
+
+<!-- Timeline navigation -->
+<nav class="timeline-spine" aria-label="Experience chapter navigation">
+  <button class="timeline-dot active" data-chapter="0" aria-label="Chapter 1: Perspective"></button>
+  <button class="timeline-dot" data-chapter="1" aria-label="Chapter 2: Lens"></button>
+  <button class="timeline-dot" data-chapter="2" aria-label="Chapter 3: Zoom"></button>
+  <button class="timeline-dot" data-chapter="3" aria-label="Chapter 4: Focus"></button>
+  <button class="timeline-dot" data-chapter="4" aria-label="Chapter 5: Depth"></button>
+  <button class="timeline-dot" data-chapter="5" aria-label="Chapter 6: Aperture"></button>
+  <button class="timeline-dot" data-chapter="6" aria-label="Chapter 7: Light"></button>
+</nav>
+
+<header id="site-header" role="banner">
+  <a href="index.html" class="header-logo" aria-label="Lenscraft Home">
+    <div class="logo-icon" aria-hidden="true"><svg viewBox="0 0 38 38" fill="none"><circle cx="19" cy="19" r="17.5" stroke="rgba(0,212,255,0.5)" stroke-width="1"/><circle cx="19" cy="19" r="12" stroke="rgba(0,212,255,0.35)" stroke-width="1"/><circle cx="19" cy="19" r="6.5" fill="rgba(0,212,255,0.15)" stroke="rgba(0,212,255,0.6)" stroke-width="1.2"/><circle cx="19" cy="19" r="2.5" fill="#00d4ff"/></svg></div>
+    <span class="text-gradient">LENSCRAFT</span>
+  </a>
+  <nav class="header-nav" aria-label="Primary navigation">
+    <a href="index.html">Home</a><a href="camera.html">Camera</a><a href="technology.html">Technology</a>
+    <a href="lens.html">Features</a><a href="gallery.html">Gallery</a>
+    <a href="experience.html" class="active">Experience</a><a href="contact.html">Contact</a>
+  </nav>
+  <a href="contact.html" class="btn-cta magnetic"><span class="magnetic-inner">CONTACT US</span></a>
+  <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobile-nav"><span></span><span></span><span></span></button>
+</header>
+<nav id="mobile-nav" aria-label="Mobile navigation" aria-hidden="true">
+  <button class="mobile-close" aria-label="Close navigation">✕</button>
+  <a href="index.html">Home</a><a href="camera.html">Camera</a><a href="technology.html">Technology</a>
+  <a href="lens.html">Features</a><a href="gallery.html">Gallery</a><a href="experience.html">Experience</a>
+  <a href="about.html">About</a><a href="contact.html">Contact</a>
+</nav>
+
+<!-- ═══ CHAPTER 0: OPEN ═══════════════════════════════════ -->
+<section class="chapter" id="ch-0" data-chapter="0" aria-labelledby="ch0-title">
+  <div class="hero-bg" aria-hidden="true"></div>
+  <div class="hero-bg-grid" aria-hidden="true"></div>
+
+  <div class="chapter-visual" aria-hidden="true">
+    <div style="position:relative;width:min(500px,70vw);height:min(500px,70vw);">
+      <div id="camera-3d" data-cursor="cam" style="width:100%;height:100%;">
+        <div class="camera-body-wrap">
+          <div class="camera-glow"></div>
+          <div class="lens-flare"></div>
+          <div class="camera-svg-wrap"></div>
+        </div>
+      </div>
+      <div class="hud-rings" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+        <div class="hud-ring hud-ring--1"></div>
+        <div class="hud-ring hud-ring--2"></div>
+        <div class="hud-ring hud-ring--3"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chapter-number" aria-hidden="true">
+    CHAPTER <strong>01</strong>
+  </div>
+
+  <div class="chapter-content" style="position:relative;z-index:10;">
+    <div class="section-label anim-hero-1" style="justify-content:center;"><span class="neon-dot"></span>THE JOURNEY BEGINS</div>
+    <h1 id="ch0-title" class="chapter-title anim-hero-2">
+      <span class="text-gradient">ENTER</span><br/>THE LENS
+    </h1>
+    <p class="chapter-body anim-hero-3">
+      Every photograph is a journey through glass, glass through space, and space into meaning.
+      Move your cursor. Feel the camera respond. Then scroll — and enter.
+    </p>
+    <div class="zoom-readout anim-hero-4" aria-label="Current focal length">
+      <span>FOCAL LENGTH</span>
+      <span class="zoom-readout-num text-gradient">24mm</span>
+      <span>↓ SCROLL</span>
+    </div>
+  </div>
+
+  <div class="hero-scroll-hint" aria-hidden="true" style="z-index:20;">
+    <div class="scroll-line"></div>
+    <span>BEGIN</span>
+  </div>
+  <div class="chapter-divider" aria-hidden="true"></div>
+</section>
+
+<!-- ═══ CHAPTER 1: THE LENS ════════════════════════════════ -->
+<section class="chapter" id="ch-1" data-chapter="1" aria-labelledby="ch1-title">
+  <div aria-hidden="true" style="position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 50%,rgba(0,50,120,.25) 0%,transparent 70%);"></div>
+
+  <div class="chapter-visual" aria-hidden="true">
+    <div class="lens-visual" style="width:min(480px,65vw);height:min(480px,65vw);">
+      <div class="lens-outer" style="inset:0;width:100%;height:100%;position:absolute;"></div>
+      <div class="lens-glass" style="inset:6%;width:auto;height:auto;position:absolute;"></div>
+      <div class="lens-aperture" style="inset:20%;width:auto;height:auto;position:absolute;">
+        <div class="lens-focus-ring" style="inset:0;width:100%;height:100%;position:absolute;"></div>
+        <div class="lens-inner" style="inset:15%;width:auto;height:auto;position:absolute;"></div>
+        <div class="lens-center-dot" style="inset:42%;width:16%;height:16%;position:absolute;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chapter-number" aria-hidden="true">CHAPTER <strong>02</strong></div>
+
+  <div class="chapter-content">
+    <div class="section-label reveal" style="justify-content:center;"><span class="neon-dot"></span>OPTICAL SYSTEM</div>
+    <h2 id="ch1-title" class="chapter-title reveal reveal-delay-1">
+      THE <span class="text-gradient">LENS</span><br/>IS THE EYE
+    </h2>
+    <p class="chapter-body reveal reveal-delay-2">
+      Eighteen perfectly ground optical elements stand between the world and your sensor.
+      Each one bends, focuses, and refines light — eliminating aberration, preserving colour,
+      maintaining contrast from corner to corner.
+    </p>
+    <div class="zoom-readout reveal reveal-delay-3" aria-label="Aperture at f/1.8">
+      <span>APERTURE</span>
+      <span class="zoom-readout-num text-gradient">f/1.8</span>
+      <span>MAX OPEN</span>
+    </div>
+  </div>
+  <div class="chapter-divider" aria-hidden="true"></div>
+</section>
+
+<!-- ═══ CHAPTER 2: ZOOM ════════════════════════════════════ -->
+<section class="chapter" id="ch-2" data-chapter="2" aria-labelledby="ch2-title">
+  <div aria-hidden="true" style="position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 50% 50%,rgba(124,58,237,.12) 0%,transparent 70%);"></div>
+
+  <!-- Animated zoom rings -->
+  <div class="chapter-visual" aria-hidden="true">
+    <div style="position:relative;width:min(520px,70vw);height:min(520px,70vw);display:flex;align-items:center;justify-content:center;">
+      <div style="position:absolute;width:100%;height:100%;border-radius:50%;border:1px solid rgba(0,212,255,.08);animation:hud-spin-cw 30s linear infinite;"></div>
+      <div style="position:absolute;width:80%;height:80%;border-radius:50%;border:1px solid rgba(0,212,255,.12);animation:hud-spin-ccw 20s linear infinite;"></div>
+      <div style="position:absolute;width:60%;height:60%;border-radius:50%;border:1.5px solid rgba(0,212,255,.2);animation:hud-spin-cw 14s linear infinite;"></div>
+      <div style="position:absolute;width:42%;height:42%;border-radius:50%;border:1.5px solid rgba(0,212,255,.3);animation:hud-spin-ccw 10s linear infinite;"></div>
+      <div style="position:absolute;width:25%;height:25%;border-radius:50%;background:radial-gradient(circle,rgba(0,212,255,.3),rgba(0,212,255,.05));border:2px solid rgba(0,212,255,.5);box-shadow:var(--glow-blue);animation:glow-pulse 3s ease-in-out infinite alternate;"></div>
+      <!-- Zoom text overlay -->
+      <div style="position:absolute;font-family:var(--font-mono);font-size:.6rem;letter-spacing:.2em;color:rgba(0,212,255,.5);top:8%;left:50%;transform:translateX(-50%);">24mm</div>
+      <div style="position:absolute;font-family:var(--font-mono);font-size:.6rem;letter-spacing:.2em;color:rgba(0,212,255,.5);bottom:8%;left:50%;transform:translateX(-50%);">200mm</div>
+    </div>
+  </div>
+
+  <div class="chapter-number" aria-hidden="true">CHAPTER <strong>03</strong></div>
+
+  <div class="chapter-content">
+    <div class="section-label reveal" style="justify-content:center;"><span class="neon-dot" style="background:var(--clr-violet-light);box-shadow:var(--glow-violet);"></span>ZOOM MECHANICS</div>
+    <h2 id="ch2-title" class="chapter-title reveal reveal-delay-1">
+      REACH ACROSS<br/><span class="text-gradient">DISTANCE</span>
+    </h2>
+    <p class="chapter-body reveal reveal-delay-2">
+      A 10× optical zoom compresses or expands space at your command.
+      At 24mm the world is wide, environmental, expansive.
+      At 200mm, your subject fills the frame and background blurs into pure cinematic depth.
+    </p>
+    <div class="zoom-readout reveal reveal-delay-3">
+      <span>RANGE</span>
+      <span class="zoom-readout-num text-gradient">10×</span>
+      <span>OPTICAL</span>
+    </div>
+  </div>
+  <div class="chapter-divider" aria-hidden="true"></div>
+</section>
+
+<!-- ═══ CHAPTER 3: FOCUS ══════════════════════════════════ -->
+<section class="chapter" id="ch-3" data-chapter="3" aria-labelledby="ch3-title">
+  <div aria-hidden="true" style="position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 50% 50%,rgba(0,40,100,.2) 0%,transparent 70%);"></div>
+
+  <!-- Focus target animation -->
+  <div class="chapter-visual" aria-hidden="true">
+    <div style="position:relative;width:min(400px,65vw);height:min(400px,65vw);display:flex;align-items:center;justify-content:center;">
+      <!-- Focus brackets -->
+      <div style="position:absolute;width:60%;height:60%;border-radius:4px;">
+        <div style="position:absolute;top:0;left:0;width:20px;height:20px;border-top:2px solid rgba(0,212,255,.8);border-left:2px solid rgba(0,212,255,.8);"></div>
+        <div style="position:absolute;top:0;right:0;width:20px;height:20px;border-top:2px solid rgba(0,212,255,.8);border-right:2px solid rgba(0,212,255,.8);"></div>
+        <div style="position:absolute;bottom:0;left:0;width:20px;height:20px;border-bottom:2px solid rgba(0,212,255,.8);border-left:2px solid rgba(0,212,255,.8);"></div>
+        <div style="position:absolute;bottom:0;right:0;width:20px;height:20px;border-bottom:2px solid rgba(0,212,255,.8);border-right:2px solid rgba(0,212,255,.8);"></div>
+      </div>
+      <!-- Radar ping -->
+      <div class="radar-ping" style="width:100%;height:100%;position:absolute;border-radius:50%;"></div>
+      <div class="radar-ping" style="width:80%;height:80%;position:absolute;border-radius:50%;animation-delay:.5s;"></div>
+      <!-- Center reticle -->
+      <div style="width:12px;height:12px;border-radius:50%;background:rgba(0,212,255,.9);box-shadow:var(--glow-blue);animation:glow-pulse 1s ease-in-out infinite alternate;position:absolute;"></div>
+      <div style="position:absolute;width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(0,212,255,.15),rgba(0,212,255,.3),rgba(0,212,255,.15),transparent);"></div>
+      <div style="position:absolute;height:100%;width:1px;background:linear-gradient(180deg,transparent,rgba(0,212,255,.15),rgba(0,212,255,.3),rgba(0,212,255,.15),transparent);"></div>
+    </div>
+  </div>
+
+  <div class="chapter-number" aria-hidden="true">CHAPTER <strong>04</strong></div>
+
+  <div class="chapter-content">
+    <div class="section-label reveal" style="justify-content:center;"><span class="neon-dot"></span>AUTOFOCUS</div>
+    <h2 id="ch3-title" class="chapter-title reveal reveal-delay-1">
+      LOCK ON<br/><span class="text-gradient">INSTANTLY</span>
+    </h2>
+    <p class="chapter-body reveal reveal-delay-2">
+      693 phase-detection points spanning 94% of the frame hunt and lock onto your subject
+      in 0.03 seconds. Real-time eye detection, motion prediction, and continuous tracking
+      ensure not a single decisive moment is missed.
+    </p>
+    <div class="zoom-readout reveal reveal-delay-3">
+      <span>LOCK SPEED</span>
+      <span class="zoom-readout-num text-gradient">0.03s</span>
+      <span>PHASE-DETECT</span>
+    </div>
+  </div>
+  <div class="chapter-divider" aria-hidden="true"></div>
+</section>
+
+<!-- ═══ CHAPTER 4: DEPTH ══════════════════════════════════ -->
+<section class="chapter" id="ch-4" data-chapter="4" aria-labelledby="ch4-title">
+  <div aria-hidden="true" style="position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 50% 50%,rgba(124,58,237,.1) 0%,transparent 70%);"></div>
+
+  <!-- Depth layers visual -->
+  <div class="chapter-visual" aria-hidden="true" style="perspective:1200px;">
+    <div style="transform-style:preserve-3d;">
+      <div style="position:absolute;width:300px;height:200px;background:rgba(5,8,16,.6);border:1px solid rgba(0,212,255,.15);border-radius:4px;transform:translateZ(-80px) translateX(-160px);backdrop-filter:blur(2px);"></div>
+      <div style="position:absolute;width:240px;height:160px;background:rgba(5,8,16,.7);border:1px solid rgba(0,212,255,.2);border-radius:4px;transform:translateZ(-40px) translateX(-80px);backdrop-filter:blur(1px);"></div>
+      <div style="width:200px;height:140px;background:rgba(10,16,35,.9);border:1.5px solid rgba(0,212,255,.4);border-radius:4px;box-shadow:var(--glow-blue);position:relative;display:flex;align-items:center;justify-content:center;">
+        <div style="font-family:var(--font-mono);font-size:.6rem;letter-spacing:.2em;color:var(--clr-blue);text-align:center;">FOCAL PLANE<br/><span style="font-size:1.2rem;font-family:var(--font-head);font-weight:700;display:block;margin-top:.3rem;" class="text-gradient">SHARP</span></div>
+      </div>
+      <div style="position:absolute;width:240px;height:160px;background:rgba(5,8,16,.5);border:1px solid rgba(0,212,255,.1);border-radius:4px;transform:translateZ(40px) translateX(80px);filter:blur(1.5px);"></div>
+      <div style="position:absolute;width:300px;height:200px;background:rgba(5,8,16,.4);border:1px solid rgba(0,212,255,.08);border-radius:4px;transform:translateZ(80px) translateX(160px);filter:blur(3px);"></div>
+    </div>
+  </div>
+
+  <div class="chapter-number" aria-hidden="true">CHAPTER <strong>05</strong></div>
+
+  <div class="chapter-content">
+    <div class="section-label reveal" style="justify-content:center;"><span class="neon-dot" style="background:var(--clr-violet-light);box-shadow:var(--glow-violet);"></span>DEPTH OF FIELD</div>
+    <h2 id="ch4-title" class="chapter-title reveal reveal-delay-1">
+      SUBJECT AND<br/><span class="text-gradient">DREAM SEPARATE</span>
+    </h2>
+    <p class="chapter-body reveal reveal-delay-2">
+      At f/1.2, the focal plane is razor thin. Your subject emerges in crystalline clarity
+      while the world behind surrenders to soft, luminous bokeh — eleven rounded blades
+      creating the smoothest, most cinematic separation possible.
+    </p>
+    <div class="zoom-readout reveal reveal-delay-3">
+      <span>BOKEH</span>
+      <span class="zoom-readout-num text-gradient">f/1.2</span>
+      <span>11 BLADES</span>
+    </div>
+  </div>
+  <div class="chapter-divider" aria-hidden="true"></div>
+</section>
+
+<!-- ═══ CHAPTER 5: APERTURE ═══════════════════════════════ -->
+<section class="chapter" id="ch-5" data-chapter="5" aria-labelledby="ch5-title">
+  <div aria-hidden="true" style="position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 50% 50%,rgba(0,30,80,.2) 0%,transparent 70%);"></div>
+
+  <div class="chapter-visual" aria-hidden="true" style="position:absolute;inset:0;">
+    <div id="aperture-section" style="position:static;min-height:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;padding:0;">
+      <div class="aperture-wrap" style="width:min(360px,60vw);height:min(360px,60vw);">
+        <div class="aperture-glow"></div>
+        <div class="aperture-svg" aria-label="Aperture animation" role="img"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chapter-number" aria-hidden="true">CHAPTER <strong>06</strong></div>
+
+  <div class="chapter-content" style="position:relative;z-index:10;">
+    <div class="section-label reveal" style="justify-content:center;"><span class="neon-dot"></span>APERTURE</div>
+    <h2 id="ch5-title" class="chapter-title reveal reveal-delay-1">
+      THE IRIS<br/><span class="text-gradient">OPENS</span>
+    </h2>
+    <p class="chapter-body reveal reveal-delay-2">
+      The aperture is the camera's eye — opening wider in darkness, closing in bright light.
+      Each f-stop doubles or halves the area, precisely controlling how much of the world
+      your sensor sees in each fraction of a second.
+    </p>
+    <div class="zoom-readout reveal reveal-delay-3">
+      <span>RANGE</span>
+      <span class="zoom-readout-num text-gradient">f/1.2</span>
+      <span>TO f/22</span>
+    </div>
+  </div>
+  <div class="chapter-divider" aria-hidden="true"></div>
+</section>
+
+<!-- ═══ CHAPTER 6: LIGHT ═══════════════════════════════════ -->
+<section class="chapter" id="ch-6" data-chapter="6" style="background:var(--clr-bg2);" aria-labelledby="ch6-title">
+
+  <!-- Light rays -->
+  <div class="chapter-visual" aria-hidden="true">
+    <div style="position:relative;width:min(420px,65vw);height:min(420px,65vw);display:flex;align-items:center;justify-content:center;">
+      <!-- Rays -->
+      <div style="position:absolute;width:100%;height:100%;">
+        <div style="position:absolute;top:50%;left:50%;width:200%;height:1px;background:linear-gradient(90deg,transparent,rgba(0,212,255,.08),transparent);transform:rotate(0deg) translateX(-50%);animation:hud-spin-cw 20s linear infinite;transform-origin:0 0;"></div>
+        <div style="position:absolute;top:50%;left:50%;width:200%;height:1px;background:linear-gradient(90deg,transparent,rgba(0,212,255,.06),transparent);transform:rotate(45deg) translateX(-50%);animation:hud-spin-cw 25s linear infinite;transform-origin:0 0;"></div>
+        <div style="position:absolute;top:50%;left:50%;width:200%;height:1px;background:linear-gradient(90deg,transparent,rgba(0,212,255,.06),transparent);transform:rotate(90deg) translateX(-50%);animation:hud-spin-cw 30s linear infinite;transform-origin:0 0;"></div>
+        <div style="position:absolute;top:50%;left:50%;width:200%;height:1px;background:linear-gradient(90deg,transparent,rgba(124,58,237,.05),transparent);transform:rotate(135deg) translateX(-50%);animation:hud-spin-cw 18s linear infinite;transform-origin:0 0;"></div>
+      </div>
+      <!-- Central glow -->
+      <div style="width:100px;height:100px;border-radius:50%;background:radial-gradient(circle,rgba(0,212,255,.5),rgba(0,212,255,.1) 40%,transparent 70%);box-shadow:0 0 60px rgba(0,212,255,.4),0 0 120px rgba(0,212,255,.15);animation:glow-pulse 2s ease-in-out infinite alternate;position:relative;z-index:1;"></div>
+    </div>
+  </div>
+
+  <div class="chapter-number" aria-hidden="true">CHAPTER <strong>07</strong></div>
+
+  <div class="chapter-content" style="position:relative;z-index:5;">
+    <div class="section-label reveal" style="justify-content:center;"><span class="neon-dot"></span>FINAL CHAPTER</div>
+    <h2 id="ch6-title" class="chapter-title reveal reveal-delay-1">
+      <span class="text-gradient">LIGHT</span><br/>IS EVERYTHING
+    </h2>
+    <p class="chapter-body reveal reveal-delay-2">
+      Photography is light writing — the Greek words for light and writing fused into one.
+      The camera is an instrument that captures light in all its nuance, contradiction,
+      and beauty. This is where the journey ends and the image begins.
+    </p>
+    <div class="zoom-readout reveal reveal-delay-3" style="margin-bottom:2rem;">
+      <span>ISO</span>
+      <span class="zoom-readout-num text-gradient">409K</span>
+      <span>MAX SENSITIVITY</span>
+    </div>
+    <div class="reveal reveal-delay-4" style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+      <a href="gallery.html" class="btn-hero magnetic" style="display:inline-flex;">
+        <span class="magnetic-inner">VIEW GALLERY <svg class="arrow" viewBox="0 0 18 18" fill="none"><path d="M3 9h12M10 4l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </a>
+      <a href="contact.html" class="btn-cta magnetic" style="display:inline-block;">
+        <span class="magnetic-inner">GET IN TOUCH</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer id="site-footer" role="contentinfo">
+  <div class="footer-lens" aria-hidden="true"></div>
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo"><svg width="32" height="32" viewBox="0 0 38 38" fill="none" aria-hidden="true"><circle cx="19" cy="19" r="17.5" stroke="rgba(0,212,255,0.5)" stroke-width="1"/><circle cx="19" cy="19" r="5" fill="rgba(0,212,255,0.2)" stroke="rgba(0,212,255,0.6)" stroke-width="1.2"/><circle cx="19" cy="19" r="2" fill="#00d4ff"/></svg><span class="text-gradient">LENSCRAFT</span></div>
+        <p class="footer-tagline">An immersive cinematic camera zoom experience. Explore depth, focus, and the art of optical perspective.</p>
+      </div>
+      <div class="footer-col"><h4>Navigation</h4><ul><li><a href="index.html">Home</a></li><li><a href="camera.html">Camera</a></li><li><a href="lens.html">Lens</a></li><li><a href="technology.html">Technology</a></li><li><a href="gallery.html">Gallery</a></li><li><a href="experience.html">Experience</a></li></ul></div>
+      <div class="footer-col"><h4>Chapters</h4><ul><li><a href="experience.html">The Lens</a></li><li><a href="experience.html">Zoom</a></li><li><a href="experience.html">Focus</a></li><li><a href="experience.html">Depth</a></li><li><a href="experience.html">Light</a></li></ul></div>
+      <div class="footer-newsletter footer-col"><h4>Newsletter</h4><p style="font-size:.8rem;color:var(--clr-grey);margin-bottom:1rem;">Stay updated with our latest experiences.</p><div class="footer-newsletter"><input type="email" placeholder="YOUR EMAIL ADDRESS" aria-label="Email"/><button class="btn-cta"><span>SUBSCRIBE</span></button></div></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">© 2026 LENSCRAFT CAMERA EXPERIENCE. ALL RIGHTS RESERVED.</p>
+      <button class="btn-top" aria-label="Back to top"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 14V4M4 9l5-5 5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+  </div>
+</footer>
+
+<script src="js/particles.js"></script>
+<script src="js/cursor.js"></script>
+<script src="js/camera-3d.js"></script>
+<script src="js/scroll.js"></script>
+<script src="js/gallery.js"></script>
+<script src="js/gallery-images.js"></script>`n<script src="js/main.js"></script>
+<script>
+// Experience page: progress bar + timeline dots
+document.addEventListener('DOMContentLoaded', () => {
+  const chapters  = document.querySelectorAll('.chapter');
+  const dots      = document.querySelectorAll('.timeline-dot');
+  const bar       = document.getElementById('exp-progress-bar');
+  const totalH    = document.documentElement.scrollHeight - window.innerHeight;
+
+  function update() {
+    const progress = Math.min(window.scrollY / totalH, 1);
+    if (bar) bar.style.height = (progress * 100) + '%';
+
+    // which chapter is most visible
+    let activeIdx = 0;
+    chapters.forEach((ch, i) => {
+      const rect = ch.getBoundingClientRect();
+      if (rect.top <= window.innerHeight * 0.5) activeIdx = i;
+    });
+    dots.forEach((d, i) => d.classList.toggle('active', i === activeIdx));
+  }
+
+  window.addEventListener('scroll', update, { passive: true });
+
+  // click timeline dots
+  dots.forEach((dot, i) => {
+    dot.addEventListener('click', () => {
+      if (chapters[i]) chapters[i].scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+});
+</script>
+</body>
+</html>
